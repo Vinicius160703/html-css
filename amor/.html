@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Te Amo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      height: 100vh;
+      touch-action: manipulation;
+    }
+
+    #teAmoText {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff69b4;
+      font-size: 48px;
+      font-weight: bold;
+      z-index: 10;
+      text-align: center;
+      animation: pulse 1.5s infinite;
+      cursor: pointer;
+    }
+
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.1); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    #message {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 32px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 11;
+      pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .rain {
+      position: absolute;
+      top: -100px;
+      color: #ff69b4;
+      animation: fall linear infinite;
+      font-size: 18px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="teAmoText">TE AMO ❤</div>
+  <div id="message">❤ TE AMO ... ❤</div>
+  <canvas id="clickParticles"></canvas>
+
+  <script>
+    const canvas = document.getElementById('clickParticles');
+    const ctx = canvas.getContext('2d');
+    const message = document.getElementById('message');
+    const teAmoText = document.getElementById('teAmoText');
+    let particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function createParticles(x, y) {
+      for (let i = 0; i < 20; i++) {
+        particles.push({
+          x,
+          y,
+          size: Math.random() * 5 + 2,
+          speedX: (Math.random() - 0.5) * 5,
+          speedY: (Math.random() - 0.5) * 5,
+          alpha: 1
+        });
+      }
+    }
+
+    document.addEventListener('click', e => {
+      createParticles(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchstart', e => {
+      for (let touch of e.touches) {
+        createParticles(touch.clientX, touch.clientY);
+      }
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.alpha -= 0.02;
+        if (p.alpha <= 0) particles.splice(i, 1);
+        else {
+          ctx.fillStyle = `rgba(255, 105, 180, ${p.alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    function createRain() {
+      const rain = document.createElement('div');
+      rain.classList.add('rain');
+      rain.innerText = 'TE AMO';
+      rain.style.left = Math.random() * window.innerWidth + 'px';
+      rain.style.animationDuration = (2 + Math.random() * 3) + 's';
+      rain.style.fontSize = (16 + Math.random() * 8) + 'px';
+      document.body.appendChild(rain);
+      setTimeout(() => rain.remove(), 6000);
+    }
+
+    setInterval(createRain, 150);
+
+    // Quando clica no "TE AMO 💔"
+    teAmoText.addEventListener('click', (e) => {
+      message.style.opacity = 1;
+      setTimeout(() => {
+        message.style.opacity = 0;
+      }, 1000); // Esconde depois de 3 segundos
+    });
+
+    // Toque em celulares
+    teAmoText.addEventListener('touchstart', (e) => {
+      message.style.opacity = 1;
+      setTimeout(() => {
+        message.style.opacity = 0;
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
